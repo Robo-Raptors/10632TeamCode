@@ -63,7 +63,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  *
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
+ */ 
 
 @Autonomous(name="Left", group="Pushbot")
 public class AutoLeft extends nyoom_drive {
@@ -115,14 +115,32 @@ public class AutoLeft extends nyoom_drive {
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
+        //yo so things that arecommented rn are what needs to be programmed
         waitForStart();
-        rightLift.setPosition(0);
+       rightLift.setPosition(0);
        leftLift.setPosition(0.5);
+       encoderDrive(TURN_SPEED, -9,9,5.0);
        encoderDrive(DRIVE_SPEED,  13,  13, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-        encoderDrive(DRIVE_SPEED,  -3,  -3, 5.0);
-       encoderDrive(TURN_SPEED, -9,9,5);
-       encoderDrive(DRIVE_SPEED,  28,  28, 5.0);
+       encoderDrive(TURN_SPEED, 9,-9,5);
+       encoderDrive(DRIVE_SPEED,  3,  3, 5.0);
+        //grab foundation
+       encoderDrive(DRIVE_SPEED,  -28,  -28, 5.0);
+        //release foundation
+       encoderDrive(DRIVE_SPEED,  -2,  -2, 5.0);
        encoderDrive(TURN_SPEED,  -5,  5, 5.0);
+       encoderDrive(DRIVE_SPEED,  28,  28, 5.0);
+       encoderDrive(TURN_SPEED,  5,  -5, 5.0);
+       encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
+       encoderDrive(TURN_SPEED,  5,  -5, 5.0);
+       encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
+       //scan for skystone
+       encoderDrive(TURN_SPEED,  -5,  5, 5.0);
+       encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
+       //grab skystone
+       encoderDrive(DRIVE_SPEED,  -8,  -8, 5.0);
+       encoderDrive(TURN_SPEED,  5,  -5, 5.0);
+        encoderDrive(DRIVE_SPEED,  28,  28, 5.0);
+        //release skystone
        double shaftAutoPower = 20;
        shaft.setPower(shaftAutoPower);
        sleep(500);
