@@ -58,10 +58,12 @@ public class nyoom_drive extends LinearOpMode {
     public ElapsedTime runtime = new ElapsedTime();
     public DcMotor leftDrive = null;
     public DcMotor rightDrive = null;
-    public DcMotor shaft = null;
-    public Servo rightLift = null;
-    public Servo leftLift = null;
-    public DcMotor backLift = null;
+    public DcMotor midDrive = null;
+    public DcMotor pulleyHorizontal = null;
+    public DcMotor pulleyVertical = null;
+    public Servo midGrib = null;
+    public Servo leftClaw = null;
+    public Servo rightClaw = null;
 
     @Override
     public void runOpMode() {
@@ -73,21 +75,24 @@ public class nyoom_drive extends LinearOpMode {
         // step (using the FTC Robot Controller app on the phone).
         leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
         rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
-        shaft = hardwareMap.get(DcMotor.class, "shaft");
-        backLift = hardwareMap.get(DcMotor.class, "back_lift");
-        rightLift = hardwareMap.get (Servo.class, "rightLift");
-        leftLift = hardwareMap.get (Servo.class, "leftLift");
+        midDrive = hardwareMap.get(DcMotor.class, "mid_drive");
+        pulleyHorizontal = hardwareMap.get(DcMotor.class, "pulley_horizontal");
+        pulleyVertical = hardwareMap.get(DcMotor.class, "pulley_vertical");
+        rightClaw = hardwareMap.get (Servo.class, "rightClaw");
+        leftClaw = hardwareMap.get (Servo.class, "leftClaw");
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         leftDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
-        shaft.setDirection (DcMotor.Direction.FORWARD);
+        midDrive.setDirection (DcMotor.Direction.FORWARD);
+        pulleyHorizontal.setDirection (DcMotor.Direction.FORWARD);
+        pulleyVertical.setDirection (DcMotor.Direction.FORWARD);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-        rightLift.setPosition(0);
-        leftLift.setPosition(0);
+        rightClaw.setPosition(0);
+        leftClaw.setPosition(0);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -95,8 +100,9 @@ public class nyoom_drive extends LinearOpMode {
             // Setup a variable for each drive wheel to save power level for telemetry
             double leftPower;
             double rightPower;
-            double shaftPower;
-            double backPower;
+            double midPower;
+            double pulleyPower;
+          
 
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
@@ -112,22 +118,22 @@ public class nyoom_drive extends LinearOpMode {
             // - This requires no math, but it is hard to drive forward slowly and keep straight.
             leftPower  = -gamepad1.left_stick_y ;
             rightPower = -gamepad1.right_stick_y ;
-            shaftPower = -gamepad2.left_stick_y ;
-            backPower = -gamepad2.right_stick_y;
+            midPower = -gamepad2.left_stick_y ;
+            pulleyPower = -gamepad1.right_stick_x;
 
             //Servo Intake Mechanism
-            if (gamepad2.left_bumper) {
-                leftLift.setPosition(0);
+            if (gamepad2.right_claw) {
+                rightClaw.setPosition(0);
         }
             else{
-                leftLift.setPosition(0.5);
+                rightClaw.setPosition(0.5);
             }
 
-            if (gamepad2.right_bumper) {
-                rightLift.setPosition(.5);
+            if (gamepad2.left_claw) {
+                leftClaw.setPosition(.5);
             }
             else{
-                rightLift.setPosition(0);
+                leftClaw.setPosition(0);
             }
 
 
@@ -135,13 +141,13 @@ public class nyoom_drive extends LinearOpMode {
             // Send calculated power to wheels
             leftDrive.setPower(leftPower);
             rightDrive.setPower(rightPower);
-            shaft.setPower(shaftPower);
-            backLift.setPower(backPower);
+            midDrive.setPower(midPower);
+          
 
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+            telemetry.addData("Motors", "left (%.2f), right (%.2f), mid (%.2f)", leftPower, rightPower);
             telemetry.update();
         }
     }
