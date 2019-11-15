@@ -58,11 +58,15 @@ public class BasicOpMode_Linear extends LinearOpMode {
     public ElapsedTime runtime = new ElapsedTime();
     public DcMotor leftDrive = null;
     public DcMotor rightDrive = null;
+    public DcMotor midDrive = null;
+    public DcMotor pulleyVertical = null;
+    public DcMotor pulleyHorizontal = null;
    /* public DcMotor
     public DcMotor */
     public Servo rightClaw = null;
     public Servo leftClaw = null;
-    public Servo gripServo = null;
+    public Servo OpenGripServo = null;
+    public Servo CloseGripServo = null;
 
     @Override
     public void runOpMode() {
@@ -74,14 +78,25 @@ public class BasicOpMode_Linear extends LinearOpMode {
         // step (using the FTC Robot Controller app on the phone).
         leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
         rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+        midDrive = hardwareMap.get(DcMotor.class, "mid_drive");
+        pulleyVertical = hardwareMap.get(DcMotor.class, "pulley_Vertical");
+        pulleyHorizontal = hardwareMap.get(DcMotor.class, "pulley_Horizontal");
         rightClaw = hardwareMap.get (Servo.class, "rightClaw");
         leftClaw = hardwareMap.get (Servo.class, "leftClaw");
-        gripServo = hardwareMap.get (Servo.class, "gripServo");
+
+        /* I separated the Grip Servo into two variables (Open and Close)
+        I used it to prevent interference with closing/opening of the Grip Servo whenever we would refer to them.
+        So, technically OpenGripServo and CloseGripServo do the same thing, but it is a helpful quality of life imo */
+        OpenGripServo = hardwareMap.get (Servo.class, "gripServo");
+        CloseGripServo = hardwareMap.get(Servo.class, "gripServo");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         leftDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        midDrive.setDirection(DcMotor.Direction.REVERSE);
+        pulleyVertical.setDirection(DcMotor.Direction.REVERSE);
+        pulleyHorizontal.setDirection(DcMotor.Direction.REVERSE);
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -94,37 +109,93 @@ public class BasicOpMode_Linear extends LinearOpMode {
             // Setup a variable for each drive wheel to save power level for telemetry
             double leftPower;
             double rightPower;
-            double gripDir = 0;
+            double midPower;
+            double HpulleyPower;
+            double VpulleyPower;
+            //double gripDir = 0;
 
             leftPower  = gamepad1.left_stick_y ;
             rightPower = gamepad1.right_stick_y ;
+            midPower = gamepad1.right_stick_x ;
+            HpulleyPower = gamepad2.right_stick_y ;
+            VpulleyPower = gamepad2.left_stick_y ;
 
             // Send calculated power to wheels
             leftDrive.setPower(leftPower);
             rightDrive.setPower(rightPower);
+            midDrive.setPower(midPower);
+            pulleyHorizontal.setPower(HpulleyPower);
+            pulleyVertical.setPower(VpulleyPower);
 
-            //Servo intake
+            //Servos Start Here
+            /*IMPORTANT SERVO UPDATE PLEASE READ.
+            Here is the discovery: so unlike last year, whenever we setPosition a servo, it does not actually set a position.
+            Instead, the values we put behave a lot more like motors as it moves a direction continuously.
+            When we set it "position" to a value of 1, the servo moves one direction forever; set it to 0, the servo moves the other; set it to .5, it stops.
+            Idk how this happened, but I believe the cause to be the time we were configuring and setting up the Rev Servos.
+            Also, I tried making the controls and programming easier and smooth by adding ELSE statements, however it was being slow because I believe the ping between the phones and controller is too high
+            */
+
+            //Controlling the RIGHT and LEFT claw
             if (gamepad1.right_bumper) {
                 rightClaw.setPosition(1);
-            }
-            else {
-                rightClaw.setPosition(0);
-            }
-
-            if (gamepad1.left_bumper) {
                 leftClaw.setPosition(1);
             }
-            else {
+            /* else {
+                rightClaw.setPosition(.5);
+                leftClaw.setPosition(.5);
+            } */
+
+            if (gamepad1.left_bumper) {
+                rightClaw.setPosition(0);
                 leftClaw.setPosition(0);
             }
+            /* else {
+                rightClaw.setPosition(.5);
+                leftClaw.setPosition(.5);
+            } */
 
-            if (gamepad1.a) {
-                gripServo.setPosition(gripDir + 0.1);
+            if (gamepad1.y) {
+                rightClaw.setPosition(.5);
+                leftClaw.setPosition(.5);
             }
 
-            if (gamepad1.b) {
-                gripServo.setPosition(gripDir - 0.1);
+
+            //CONTROLLING THE GRIP SERVO
+            /* if (gamepad2.x) {
+                OpenGripServo.setPosition(1);
             }
+            else {
+                CloseGripServo.setPosition(.5);
+            }
+
+            if (gamepad2.b) {
+                OpenGripServo.setPosition(0);
+            }
+            else {
+                CloseGripServo.setPosition(.5);
+            } */
+
+             if (gamepad2.y) {
+               CloseGripServo.setPosition(.5);
+           }
+            if (gamepad2.x) {
+                CloseGripServo.setPosition(0);
+            }
+            if (gamepad2.b) {
+                CloseGripServo.setPosition(1);
+            }
+
+            // Failed experiment...but a damn good one
+           /* if ((gamepad2.x) && (CloseGripServo.getPosition() >= 1)) {
+                CloseGripServo.setPosition(CloseGripServo.getPosition() - .1);
+            }
+
+            if ((gamepad2.b) && (OpenGripServo.getPosition() >= 1)) {
+                OpenGripServo.setPosition(OpenGripServo.getPosition() + .1);
+            } */
+
+
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
