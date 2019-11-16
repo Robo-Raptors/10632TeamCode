@@ -30,54 +30,49 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
  * It uses the common Pushbot hardware class to define the drive on the robot.
  * The code is structured as a LinearOpMode
- *
+ * <p>
  * The code REQUIRES that you DO have encoders on the wheels,
- *   otherwise you would use: PushbotAutoDriveByTime;
- *
- *  This code ALSO requires that the drive Motors have been configured such that a positive
- *  power command moves them forwards, and causes the encoders to count UP.
- *
- *   The desired path in this example is:
- *   - Drive forward for 48 inches
- *   - Spin right for 12 Inches
- *   - Drive Backwards for 24 inches
- *   - Stop and close the claw.
- *
- *  The code is written using a method called: encoderDrive(speed, leftInches, rightInches, timeoutS)
- *  that performs the actual movement.
- *  This methods assumes that each movement is relative to the last stopping place.
- *  There are other ways to perform encoder based moves, but this method is probably the simplest.
- *  This code uses the RUN_TO_POSITION mode to enable the Motor controllers to generate the run profile
- *
+ * otherwise you would use: PushbotAutoDriveByTime;
+ * <p>
+ * This code ALSO requires that the drive Motors have been configured such that a positive
+ * power command moves them forwards, and causes the encoders to count UP.
+ * <p>
+ * The desired path in this example is:
+ * - Drive forward for 48 inches
+ * - Spin right for 12 Inches
+ * - Drive Backwards for 24 inches
+ * - Stop and close the claw.
+ * <p>
+ * The code is written using a method called: encoderDrive(speed, leftInches, rightInches, timeoutS)
+ * that performs the actual movement.
+ * This methods assumes that each movement is relative to the last stopping place.
+ * There are other ways to perform encoder based moves, but this method is probably the simplest.
+ * This code uses the RUN_TO_POSITION mode to enable the Motor controllers to generate the run profile
+ * <p>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */ 
+ */
 
-@Autonomous(name="Left", group="Pushbot")
-public class AutoLeft extends nyoom_drive {
+@Autonomous(name = "AutoRed", group = "Pushbot")
+public class AutoRed extends nyoom_drive {
 
-    /* Declare OpMode members. */
-    private ElapsedTime     runtime = new ElapsedTime();
-
-    static final double     COUNTS_PER_MOTOR_REV    = 288 ;    // eg: TETRIX Motor Encoder
-    static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 3.0 ;     // For figuring circumference
-    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+    static final double COUNTS_PER_MOTOR_REV = 288;    // eg: TETRIX Motor Encoder
+    static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
+    static final double WHEEL_DIAMETER_INCHES = 3.0;     // For figuring circumference
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 0.6;
-    static final double     TURN_SPEED              = 0.5;
+    static final double DRIVE_SPEED = 0.6;
+    static final double TURN_SPEED = 0.5;
+    /* Declare OpMode members. */
+    private ElapsedTime runtime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -91,64 +86,73 @@ public class AutoLeft extends nyoom_drive {
         telemetry.addData("Status", "Resetting Encoders");    //
         telemetry.update();
 
-        //Motor
+        //Motor and Servos
         leftDrive = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive =  hardwareMap.get(DcMotor.class, "right_drive");
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
-        shaft = hardwareMap.get(DcMotor.class, "shaft");
+        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+        midDrive = hardwareMap.get(DcMotor.class, "mid_drive");
+        pulleyVertical = hardwareMap.get(DcMotor.class, "pulley_Vertical");
+        pulleyHorizontal = hardwareMap.get(DcMotor.class, "pulley_Horizontal");
+        rightClaw = hardwareMap.get(Servo.class, "rightClaw");
+        leftClaw = hardwareMap.get(Servo.class, "leftClaw");
 
-        //Servos
-        rightLift = hardwareMap.get (Servo.class, "rightLift");
-        leftLift = hardwareMap.get (Servo.class, "leftLift");
+        OpenGripServo = hardwareMap.get(Servo.class, "gripServo");
+        ClosedGripServo = hardwareMap.get(Servo.class, "gripServo");
 
-        //Reset and Start Encodddddddddd
+
+        //Reset and Start Encode
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        midDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        pulleyVertical.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        pulleyHorizontal.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        midDrive.setMode(DcMotor.RunMode.RUN_AND_RESET_ENCODER);
+        pulleyVertical.setMode(DcMotor.RunMode.RUN_AND_RESET_ENCODER);
+        pulleyHorizontal.setMode(DcMotor.RunMode.RUN_AND_RESET_ENCODER);
 
         // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Path0",  "Starting at %7d :%7d",
+        telemetry.addData("Path0", "Starting at %7d :%7d",
                 leftDrive.getCurrentPosition(),
-                rightDrive.getCurrentPosition());
+                rightDrive.getCurrentPosition();
+        midDrive.getCurrentPosition();
+        pulleyVertical.getCurrentPosition();
+        pulleyHorizontal.getCurrentPosition();
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
-        //yo so things that arecommented rn are what needs to be programmed
         waitForStart();
-       rightLift.setPosition(0);
-       leftLift.setPosition(0.5);
-       encoderDrive(TURN_SPEED, -9,9,5.0);
-       encoderDrive(DRIVE_SPEED,  13,  13, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
-       encoderDrive(TURN_SPEED, 9,-9,5);
-       encoderDrive(DRIVE_SPEED,  3,  3, 5.0);
-        //grab foundation
-       encoderDrive(DRIVE_SPEED,  -28,  -28, 5.0);
-        //release foundation
-       encoderDrive(DRIVE_SPEED,  -2,  -2, 5.0);
-       encoderDrive(TURN_SPEED,  -5,  5, 5.0);
-       encoderDrive(DRIVE_SPEED,  28,  28, 5.0);
-       encoderDrive(TURN_SPEED,  5,  -5, 5.0);
-       encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
-       encoderDrive(TURN_SPEED,  5,  -5, 5.0);
-       encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
-       //scan for skystone
-       encoderDrive(TURN_SPEED,  -5,  5, 5.0);
-       encoderDrive(DRIVE_SPEED,  8,  8, 5.0);
-       //grab skystone
-       encoderDrive(DRIVE_SPEED,  -8,  -8, 5.0);
-       encoderDrive(TURN_SPEED,  5,  -5, 5.0);
-        encoderDrive(DRIVE_SPEED,  28,  28, 5.0);
-        //release skystone
-       double shaftAutoPower = 20;
-       shaft.setPower(shaftAutoPower);
-       sleep(500);
-       shaft.setPower(0);
-       encoderDrive(DRIVE_SPEED,  50,  50, 10);
-       rightLift.setPosition(0.5);
-       leftLift.setPosition(0);
-       encoderDrive(DRIVE_SPEED,  -70,  -70, 10);
+        pulleyHorizontal.setPosition(0);
+        pulleyVertical.setPosition(0);
+        encoderDrive(DRIVE_SPEED, 40, 40, 5.0);  // S1: Forward 47 Inches with 5 Sec timeout
+        encoderTurn(DRIVE_TURN, -20, 20, 5.0);
+        encoderDrive(DRIVE_SPEED, 10, 10, 5.0);
+        /*
+        encoderTurn(DRIVE_TURN,  -20,  20, 5.0);
+        encoderDrive(DRIVE_SPEED,  10,  10, 5.0);
+        encoderTurn(DRIVE_TURN,  -20,  20, 5.0);
+        encoderDrive(DRIVE_SPEED,  60,  60, 5.0);
+        encoderDrive(DRIVE_SPEED,  -5,  -5, 5.0);
+         */
+        midDrive.setPower(20);
+        sleep(500);
+        midDrive.setPower(0);
+        encoderDrive(DRIVE_SPEED, -60, -60, 5.0);
+        encoderTurn(DRIVE_TURN, 20, -20, 5.0);
+        encoderDrive(DRIVE_SPEED, 10, 10, 5.0);
+        gripServo.setPosition(1);
+        encoderDrive(DRIVE_SPEED, -10, -10, 5.0);
+        midDrive.setPower(20);
+        sleep(500);
+        midDrive.setPower(0);
+          /* encoderTurn(DRIVE_TURN,  -20,  20, 5.0);
+        encoderDrive(DRIVE_SPEED,  20,  20, 5.0);
+         */
+        gripServo.setPosition(0);
+        encoderDrive(DRIVE_SPEED, -5, -5, 5.0);
+        sleep(1000);     // pause for servos to move
+
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -172,8 +176,8 @@ public class AutoLeft extends nyoom_drive {
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newLeftTarget = leftDrive.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
-            newRightTarget = rightDrive.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+            newLeftTarget = leftDrive.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
+            newRightTarget = rightDrive.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
             leftDrive.setTargetPosition(newLeftTarget);
             rightDrive.setTargetPosition(newRightTarget);
 
@@ -197,8 +201,8 @@ public class AutoLeft extends nyoom_drive {
                     (leftDrive.isBusy() && rightDrive.isBusy())) {
 
                 // Display it for the driver.
-                telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
-                telemetry.addData("Path2",  "Running at %7d :%7d",
+                telemetry.addData("Path1", "Running to %7d :%7d", newLeftTarget, newRightTarget);
+                telemetry.addData("Path2", "Running at %7d :%7d",
                         leftDrive.getCurrentPosition(),
                         rightDrive.getCurrentPosition());
                 telemetry.update();
@@ -216,3 +220,4 @@ public class AutoLeft extends nyoom_drive {
         }
     }
 }
+
