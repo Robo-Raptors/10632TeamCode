@@ -118,13 +118,11 @@ public class SafeAutoRed extends BasicOpMode_Linear {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        encoderDrive(DRIVE_SPEED,  -10,  10,  5);  // S1: Forward 47 Inches with 5 Sec timeout
-        midDrive.setDirection(DcMotor.Direction.FORWARD);
-        midDrive.setPower(.6);
-        sleep(6000);
-        midDrive.setPower(0);
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
+        encoderDrive(DRIVE_SPEED,  -10,  10,  5);  // S1: Forward 10 Inches with 5 Sec timeout
+        midDrive.setDirection(DcMotor.Direction.FORWARD); //Set mid drive direction to forward
+        midDrive.setPower(.6); //Set mid drive power to .6
+        sleep(6000); //Robotic is given 6 seconds to do previous code until next code
+        midDrive.setPower(0); //Set mid drive power to 0
         telemetry.addData("Path", "Complete");
         telemetry.update();
     }

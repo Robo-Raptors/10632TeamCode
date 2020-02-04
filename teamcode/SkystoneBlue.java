@@ -119,36 +119,35 @@ public class SkystoneBlue extends BasicOpMode_Linear {
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        CapServo.setPosition(0.25);
-        OpenGripServo.setPosition(1);
-        CloseGripServo.setPosition(0);
-        encoderDrive(DRIVE_SPEED,  -32,  32,  5);  // S1: Forward 47 Inches with 5 Sec timeout
-        OpenGripServo.setPosition(0);
-        CloseGripServo.setPosition(1);
-        encoderDrive(DRIVE_SPEED,  36,  -36, 5);  // S1: Forward 47 Inches with 5 Sec timeout
-        OpenGripServo.setPosition(1);
-        CloseGripServo.setPosition(0);
-        encoderDrive(DRIVE_SPEED,  1,  -1, 5);
-        encoderDrive(TURN_SPEED,  5,  -5,  5);
-        encoderDrive(DRIVE_SPEED,  -20,  20,  5);
-        midDrive.setDirection(DcMotor.Direction.REVERSE);
-        midDrive.setPower(1);
-        sleep(1000);
+        CapServo.setPosition(0.25); // Set the Capping mechanism to its middle position
+        OpenGripServo.setPosition(1); // Set the servo to an open position
+        CloseGripServo.setPosition(0); // Set the servo to an open position
+        encoderDrive(DRIVE_SPEED,  -32,  32,  5);  //  Forward 32 Inches with 5 Sec timeout
+        OpenGripServo.setPosition(0); // Set the servo to an closed position
+        CloseGripServo.setPosition(1);  // Set the servo to an closed position
+        encoderDrive(DRIVE_SPEED,  36,  -36, 5);  //  Backward 36 Inches with 5 Sec timeout
+        OpenGripServo.setPosition(1); // Set the servo to an open position
+        CloseGripServo.setPosition(0); // Set the servo to an open position
+        encoderDrive(DRIVE_SPEED,  1,  -1, 5); // Backward 1 Inch with 5 Sec timeout
+        midDrive.setDirection(DcMotor.Direction.REVERSE); // Set mid drive direction to reverse
+        midDrive.setPower(1); //Set mid drive power to 1
+        sleep(1000); //Robot has 1 second to do previous code until it completes upcoming code
+        midDrive.setPower(0); // pause for servos to move
         encoderDrive(DRIVE_SPEED,  20,  -20,  5);
-        //sensor code here//
+        //This is where we would input vuforia if given the time //
         encoderDrive(TURN_SPEED,  5,  -5,  5);
         encoderDrive(DRIVE_SPEED,  -5,  5,  5);
-        OpenGripServo.setPosition(0);
-        CloseGripServo.setPosition(1);
+        OpenGripServo.setPosition(0); // Set the servo to an closed position
+        CloseGripServo.setPosition(1);  // Set the servo to an closed position
         encoderDrive(DRIVE_SPEED,  15,  -15,  5);
-        midDrive.setDirection(DcMotor.Direction.FORWARD);
-        midDrive.setPower(1);
-        sleep(7000);
-        OpenGripServo.setPosition(1);
-        CloseGripServo.setPosition(0);
-        midDrive.setDirection(DcMotor.Direction.FORWARD);
-        midDrive.setPower(1);
-        sleep(1000);
+        midDrive.setDirection(DcMotor.Direction.FORWARD); // Set mid drive direction to forward
+        midDrive.setPower(1);  //Set mid drive power to 1
+        sleep(7000);  //Robot has 7 second to do previous code until it completes upcoming code
+        OpenGripServo.setPosition(1);  // Set the servo to an open position
+        CloseGripServo.setPosition(0);  // Set the servo to an open position
+        midDrive.setDirection(DcMotor.Direction.FORWARD);  // Set mid drive direction to forward
+        midDrive.setPower(1);  //Set mid drive power to 1
+        sleep(1000);  //Robot has 1 second to do previous code until it completes upcoming code
         telemetry.addData("Path", "Complete");
         telemetry.update();
     }

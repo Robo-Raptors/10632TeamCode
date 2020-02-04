@@ -130,10 +130,10 @@ public class AutoRed extends BasicOpMode_Linear {
         encoderDrive(DRIVE_SPEED,  36,  -36, 5);  //  Backward 36 Inches with 5 Sec timeout
         OpenGripServo.setPosition(1); // Set the servo to an open position
         CloseGripServo.setPosition(0); // Set the servo to an open position
-        encoderDrive(DRIVE_SPEED,  1,  -1, 5); // Backward 1 Inche with 5 Sec timeout
-        midDrive.setDirection(DcMotor.Direction.FORWARD); //
-        midDrive.setPower(1);
-        sleep(4500);
+        encoderDrive(DRIVE_SPEED,  1,  -1, 5); // Backward 1 Inch with 5 Sec timeout
+        midDrive.setDirection(DcMotor.Direction.FORWARD); // Set mid drive direction to forward
+        midDrive.setPower(1); //Set mid drive power to 1
+        sleep(4500); //Robot has 4.5 seconds to do previous code until it completes upcoming code
         midDrive.setPower(0); // pause for servos to move
         telemetry.addData("Path", "Complete");
         telemetry.update();
